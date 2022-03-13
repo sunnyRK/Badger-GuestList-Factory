@@ -10,12 +10,17 @@ const mnemonic = process.env.MNEMONIC;
 const networks: HardhatUserConfig['networks'] = {
   hardhat: {
     forking: {
-      url: "https://rpc.ftm.tools/"
+      url: "https://rpc.ftm.tools/",
     },
+    chainId: 250,
     allowUnlimitedContractSize: true,
   },
   local: {
     url: "http://localhost:8545",
+    timeout: 1000000 //1000 secs
+  },
+  ftm: {
+    url: "https://rpc.ftm.tools/",
     timeout: 1000000 //1000 secs
   }
 };

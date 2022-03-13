@@ -24,11 +24,6 @@ const _abi = [
         name: "amountIn",
         type: "uint256",
       },
-      {
-        internalType: "uint256",
-        name: "chainId",
-        type: "uint256",
-      },
     ],
     name: "findOptimalSwap",
     outputs: [
@@ -73,6 +68,30 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_lpToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_lpAmount",
+        type: "uint256",
+      },
+    ],
+    name: "getUnderlyingPrice",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "totalLpPrice",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "getUniV2Quote",
     outputs: [
@@ -80,6 +99,30 @@ const _abi = [
         internalType: "address",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_lpToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_lpAmount",
+        type: "uint256",
+      },
+    ],
+    name: "viewUnderlyingPrice",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "totalLpPrice",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

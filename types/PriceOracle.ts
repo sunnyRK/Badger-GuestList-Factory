@@ -23,14 +23,18 @@ export interface PriceOracleInterface extends utils.Interface {
     "SOLIDLY_ROUTER()": FunctionFragment;
     "SPOOKY_ROUTER()": FunctionFragment;
     "chainRouters(uint256)": FunctionFragment;
-    "findOptimalSwap(address,address,uint256,uint256)": FunctionFragment;
-    "getCurveQuote(uint256)": FunctionFragment;
-    "getSolidlyQuote(uint256)": FunctionFragment;
-    "getUniV2Quote(uint256)": FunctionFragment;
+    "findOptimalSwap(address,address,uint256)": FunctionFragment;
+    "getChainID()": FunctionFragment;
+    "getCurveQuote()": FunctionFragment;
+    "getSolidlyQuote()": FunctionFragment;
+    "getUnderlyingPrice(address,uint256)": FunctionFragment;
+    "getUniV2Quote()": FunctionFragment;
+    "iUniswapLPOracleFactory()": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "setRouters(uint256,address,address,address)": FunctionFragment;
+    "setRoutersForSpecificChainId(uint256,address,address,address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "viewUnderlyingPrice(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -51,19 +55,31 @@ export interface PriceOracleInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "findOptimalSwap",
-    values: [string, string, BigNumberish, BigNumberish]
+    values: [string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getChainID",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getCurveQuote",
-    values: [BigNumberish]
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getSolidlyQuote",
-    values: [BigNumberish]
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getUnderlyingPrice",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getUniV2Quote",
-    values: [BigNumberish]
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "iUniswapLPOracleFactory",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -71,12 +87,16 @@ export interface PriceOracleInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setRouters",
+    functionFragment: "setRoutersForSpecificChainId",
     values: [BigNumberish, string, string, string]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "viewUnderlyingPrice",
+    values: [string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -99,6 +119,7 @@ export interface PriceOracleInterface extends utils.Interface {
     functionFragment: "findOptimalSwap",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getChainID", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getCurveQuote",
     data: BytesLike
@@ -108,7 +129,15 @@ export interface PriceOracleInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getUnderlyingPrice",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getUniV2Quote",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "iUniswapLPOracleFactory",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
@@ -116,9 +145,16 @@ export interface PriceOracleInterface extends utils.Interface {
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setRouters", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setRoutersForSpecificChainId",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "viewUnderlyingPrice",
     data: BytesLike
   ): Result;
 
@@ -185,24 +221,24 @@ export interface PriceOracle extends BaseContract {
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
-      chainId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { amount: BigNumber }>;
 
-    getCurveQuote(
-      chainId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+    getChainID(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getSolidlyQuote(
-      chainId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+    getCurveQuote(overrides?: CallOverrides): Promise<[string]>;
 
-    getUniV2Quote(
-      chainId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+    getSolidlyQuote(overrides?: CallOverrides): Promise<[string]>;
+
+    getUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    getUniV2Quote(overrides?: CallOverrides): Promise<[string]>;
+
+    iUniswapLPOracleFactory(overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -210,7 +246,7 @@ export interface PriceOracle extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setRouters(
+    setRoutersForSpecificChainId(
       chainId: BigNumberish,
       _spookyRouter: string,
       _solidlyRouter: string,
@@ -222,6 +258,12 @@ export interface PriceOracle extends BaseContract {
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    viewUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { totalLpPrice: BigNumber }>;
   };
 
   CURVE_ROUTER(overrides?: CallOverrides): Promise<string>;
@@ -245,24 +287,24 @@ export interface PriceOracle extends BaseContract {
     tokenIn: string,
     tokenOut: string,
     amountIn: BigNumberish,
-    chainId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber] & { amount: BigNumber }>;
 
-  getCurveQuote(
-    chainId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
+  getChainID(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getSolidlyQuote(
-    chainId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
+  getCurveQuote(overrides?: CallOverrides): Promise<string>;
 
-  getUniV2Quote(
-    chainId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
+  getSolidlyQuote(overrides?: CallOverrides): Promise<string>;
+
+  getUnderlyingPrice(
+    _lpToken: string,
+    _lpAmount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  getUniV2Quote(overrides?: CallOverrides): Promise<string>;
+
+  iUniswapLPOracleFactory(overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -270,7 +312,7 @@ export interface PriceOracle extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setRouters(
+  setRoutersForSpecificChainId(
     chainId: BigNumberish,
     _spookyRouter: string,
     _solidlyRouter: string,
@@ -282,6 +324,12 @@ export interface PriceOracle extends BaseContract {
     newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  viewUnderlyingPrice(
+    _lpToken: string,
+    _lpAmount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   callStatic: {
     CURVE_ROUTER(overrides?: CallOverrides): Promise<string>;
@@ -305,30 +353,30 @@ export interface PriceOracle extends BaseContract {
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
-      chainId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { amount: BigNumber }>;
 
-    getCurveQuote(
-      chainId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
+    getChainID(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getSolidlyQuote(
-      chainId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
+    getCurveQuote(overrides?: CallOverrides): Promise<string>;
 
-    getUniV2Quote(
-      chainId: BigNumberish,
+    getSolidlyQuote(overrides?: CallOverrides): Promise<string>;
+
+    getUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<BigNumber>;
+
+    getUniV2Quote(overrides?: CallOverrides): Promise<string>;
+
+    iUniswapLPOracleFactory(overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    setRouters(
+    setRoutersForSpecificChainId(
       chainId: BigNumberish,
       _spookyRouter: string,
       _solidlyRouter: string,
@@ -340,6 +388,12 @@ export interface PriceOracle extends BaseContract {
       newOwner: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    viewUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {
@@ -369,24 +423,24 @@ export interface PriceOracle extends BaseContract {
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
-      chainId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getCurveQuote(
-      chainId: BigNumberish,
-      overrides?: CallOverrides
+    getChainID(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getCurveQuote(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getSolidlyQuote(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getSolidlyQuote(
-      chainId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    getUniV2Quote(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getUniV2Quote(
-      chainId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    iUniswapLPOracleFactory(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -394,7 +448,7 @@ export interface PriceOracle extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setRouters(
+    setRoutersForSpecificChainId(
       chainId: BigNumberish,
       _spookyRouter: string,
       _solidlyRouter: string,
@@ -405,6 +459,12 @@ export interface PriceOracle extends BaseContract {
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    viewUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
@@ -424,22 +484,24 @@ export interface PriceOracle extends BaseContract {
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
-      chainId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getCurveQuote(
-      chainId: BigNumberish,
-      overrides?: CallOverrides
+    getChainID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getCurveQuote(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getSolidlyQuote(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getSolidlyQuote(
-      chainId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getUniV2Quote(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getUniV2Quote(
-      chainId: BigNumberish,
+    iUniswapLPOracleFactory(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -449,7 +511,7 @@ export interface PriceOracle extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setRouters(
+    setRoutersForSpecificChainId(
       chainId: BigNumberish,
       _spookyRouter: string,
       _solidlyRouter: string,
@@ -460,6 +522,12 @@ export interface PriceOracle extends BaseContract {
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    viewUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
 }

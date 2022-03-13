@@ -19,7 +19,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface GuestProxyFactoryInterface extends utils.Interface {
   functions: {
-    "createNewProxy(address,address,address,uint256,uint256,uint256,bytes32)": FunctionFragment;
+    "createNewProxy(address,address,address,uint256,uint256,bytes32,bool)": FunctionFragment;
     "iGenericProxyFactory()": FunctionFragment;
     "iPriceOracle()": FunctionFragment;
     "instance()": FunctionFragment;
@@ -33,8 +33,8 @@ export interface GuestProxyFactoryInterface extends utils.Interface {
       string,
       BigNumberish,
       BigNumberish,
-      BigNumberish,
-      BytesLike
+      BytesLike,
+      boolean
     ]
   ): string;
   encodeFunctionData(
@@ -97,8 +97,8 @@ export interface GuestProxyFactory extends BaseContract {
       _newOwner: string,
       _userDepositCap: BigNumberish,
       _totalDepositCap: BigNumberish,
-      _chainId: BigNumberish,
       _guestRoot: BytesLike,
+      isLPToken: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -115,8 +115,8 @@ export interface GuestProxyFactory extends BaseContract {
     _newOwner: string,
     _userDepositCap: BigNumberish,
     _totalDepositCap: BigNumberish,
-    _chainId: BigNumberish,
     _guestRoot: BytesLike,
+    isLPToken: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -133,8 +133,8 @@ export interface GuestProxyFactory extends BaseContract {
       _newOwner: string,
       _userDepositCap: BigNumberish,
       _totalDepositCap: BigNumberish,
-      _chainId: BigNumberish,
       _guestRoot: BytesLike,
+      isLPToken: boolean,
       overrides?: CallOverrides
     ): Promise<[string, string] & { instanceCreated: string; result: string }>;
 
@@ -154,8 +154,8 @@ export interface GuestProxyFactory extends BaseContract {
       _newOwner: string,
       _userDepositCap: BigNumberish,
       _totalDepositCap: BigNumberish,
-      _chainId: BigNumberish,
       _guestRoot: BytesLike,
+      isLPToken: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -173,8 +173,8 @@ export interface GuestProxyFactory extends BaseContract {
       _newOwner: string,
       _userDepositCap: BigNumberish,
       _totalDepositCap: BigNumberish,
-      _chainId: BigNumberish,
       _guestRoot: BytesLike,
+      isLPToken: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -5,6 +5,7 @@ import "./TestVipCappedGuestListBbtcUpgradeable.sol";
 import "./interfaces/IGenericProxyFactory.sol";
 import "./interfaces/oracle/IPriceOracle.sol";
 import "./interfaces/mock/IVault.sol";
+import "hardhat/console.sol";
 
 contract GuestProxyFactory {
     
@@ -27,13 +28,19 @@ contract GuestProxyFactory {
         address _newOwner,
         uint256 _userDepositCap,
         uint256 _totalDepositCap,
-        uint256 _chainId,
-        bytes32 _guestRoot
+        bytes32 _guestRoot,
+        bool isLPToken
     ) public returns (address instanceCreated, bytes memory result) {
             (instanceCreated, result)= iGenericProxyFactory.create(address(instance), '' );
             TestVipCappedGuestListBbtcUpgradeable guest = TestVipCappedGuestListBbtcUpgradeable(instanceCreated);
             address want = IVault(_wrapper).token();
-            (,uint256 wantAmount) = iPriceOracle.findOptimalSwap(_usdc, want, _totalDepositCap, _chainId);
+            uint256 wantAmount;
+            if (isLPToken) {
+                wantAmount = iPriceOracle.getUnderlyingPrice(want, _totalDepositCap);
+                console.log('wantAmount', wantAmount);
+            } else {
+                (, wantAmount) = iPriceOracle.findOptimalSwap(_usdc, want, _totalDepositCap);
+            }
             guest.initialize(_wrapper);
             guest.setUserDepositCap(_userDepositCap);
             guest.setTotalDepositCap(wantAmount);

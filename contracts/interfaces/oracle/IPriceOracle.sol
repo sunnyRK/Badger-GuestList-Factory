@@ -8,7 +8,8 @@ interface IPriceOracle {
     function findOptimalSwap(
         address tokenIn, 
         address tokenOut, 
-        uint256 amountIn,
-        uint256 chainId
+        uint256 amountIn
     ) external view returns (string memory, uint256 amount);
+    function getUnderlyingPrice(address _lpToken, uint256 _lpAmount) external returns(uint256 totalLpPrice);
+    function viewUnderlyingPrice(address _lpToken, uint256 _lpAmount) external view returns(uint256 totalLpPrice);
 }

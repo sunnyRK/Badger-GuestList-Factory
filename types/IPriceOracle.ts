@@ -7,6 +7,8 @@ import {
   BigNumberish,
   BytesLike,
   CallOverrides,
+  ContractTransaction,
+  Overrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -17,15 +19,17 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface IPriceOracleInterface extends utils.Interface {
   functions: {
-    "findOptimalSwap(address,address,uint256,uint256)": FunctionFragment;
+    "findOptimalSwap(address,address,uint256)": FunctionFragment;
     "getCurveQuote()": FunctionFragment;
     "getSolidlyQuote()": FunctionFragment;
+    "getUnderlyingPrice(address,uint256)": FunctionFragment;
     "getUniV2Quote()": FunctionFragment;
+    "viewUnderlyingPrice(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "findOptimalSwap",
-    values: [string, string, BigNumberish, BigNumberish]
+    values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getCurveQuote",
@@ -36,8 +40,16 @@ export interface IPriceOracleInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getUnderlyingPrice",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getUniV2Quote",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "viewUnderlyingPrice",
+    values: [string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -53,7 +65,15 @@ export interface IPriceOracleInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getUnderlyingPrice",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getUniV2Quote",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "viewUnderlyingPrice",
     data: BytesLike
   ): Result;
 
@@ -91,7 +111,6 @@ export interface IPriceOracle extends BaseContract {
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
-      chainId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { amount: BigNumber }>;
 
@@ -99,14 +118,25 @@ export interface IPriceOracle extends BaseContract {
 
     getSolidlyQuote(overrides?: CallOverrides): Promise<[string]>;
 
+    getUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     getUniV2Quote(overrides?: CallOverrides): Promise<[string]>;
+
+    viewUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { totalLpPrice: BigNumber }>;
   };
 
   findOptimalSwap(
     tokenIn: string,
     tokenOut: string,
     amountIn: BigNumberish,
-    chainId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber] & { amount: BigNumber }>;
 
@@ -114,14 +144,25 @@ export interface IPriceOracle extends BaseContract {
 
   getSolidlyQuote(overrides?: CallOverrides): Promise<string>;
 
+  getUnderlyingPrice(
+    _lpToken: string,
+    _lpAmount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   getUniV2Quote(overrides?: CallOverrides): Promise<string>;
+
+  viewUnderlyingPrice(
+    _lpToken: string,
+    _lpAmount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   callStatic: {
     findOptimalSwap(
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
-      chainId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { amount: BigNumber }>;
 
@@ -129,7 +170,19 @@ export interface IPriceOracle extends BaseContract {
 
     getSolidlyQuote(overrides?: CallOverrides): Promise<string>;
 
+    getUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getUniV2Quote(overrides?: CallOverrides): Promise<string>;
+
+    viewUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {};
@@ -139,7 +192,6 @@ export interface IPriceOracle extends BaseContract {
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
-      chainId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -147,7 +199,19 @@ export interface IPriceOracle extends BaseContract {
 
     getSolidlyQuote(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     getUniV2Quote(overrides?: CallOverrides): Promise<BigNumber>;
+
+    viewUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -155,7 +219,6 @@ export interface IPriceOracle extends BaseContract {
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
-      chainId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -163,6 +226,18 @@ export interface IPriceOracle extends BaseContract {
 
     getSolidlyQuote(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     getUniV2Quote(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    viewUnderlyingPrice(
+      _lpToken: string,
+      _lpAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
   };
 }
