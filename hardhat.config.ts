@@ -12,6 +12,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import { HardhatUserConfig } from 'hardhat/config';
+import { version } from 'os';
 
 const config: HardhatUserConfig = {
   mocha: {
@@ -32,6 +33,9 @@ const config: HardhatUserConfig = {
     compilers: [
       {
         version: "0.6.6",
+      },
+      {
+        version: "0.7.6",
       },
       {
         version: '0.8.4',

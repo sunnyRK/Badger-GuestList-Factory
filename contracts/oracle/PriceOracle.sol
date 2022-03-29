@@ -1,27 +1,29 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.7.6;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "../interfaces/uniswap/IUniswapV3Pool.sol";
+import "../interfaces/uniswap/TickMath.sol";
+import "../interfaces/uniswap/FixedPoint96.sol";
+import "../interfaces/uniswap/FullMath.sol";
 import "../interfaces/oracle/IUniswapRouterV2.sol";
 import "../interfaces/oracle/ICurveRouter.sol";
 import "../interfaces/oracle/IBaseV1Router01.sol";
 import "../interfaces/oracle/IUniswapLPOracleFactory.sol";
 import "hardhat/console.sol";
 
-contract PriceOracle is OwnableUpgradeable {
+interface IQuote {
+    function getRouter() external view returns(address);
+    function getQuote(bytes calldata data) external view returns (uint256 quote);
+}
+
+contract PriceOracle {
 
     IUniswapLPOracleFactory public iUniswapLPOracleFactory;
-
-    address public SOLIDLY_ROUTER;
-    address public SPOOKY_ROUTER;
-    address public CURVE_ROUTER;
-
-    struct Routers {
-        address SPOOKY_ROUTER;
-        address SOLIDLY_ROUTER;
-        address CURVE_ROUTER;
-    }
-    mapping(uint256 => Routers) public chainRouters;
+    mapping(uint256 => address) public routerByIndex;
+    mapping(address => uint256) public indexByRouter;
+    mapping(uint256 => bool) public isRouterWorking;
+    uint256 public totalRouters;
+    address public governance;
 
     constructor(
         address _spookyRouter, 
@@ -29,95 +31,75 @@ contract PriceOracle is OwnableUpgradeable {
         address _curveRouter,
         address _iUniswapLPOracleFactory
     ) public {
-        Routers memory routers = Routers({
-            SPOOKY_ROUTER: _spookyRouter,
-            SOLIDLY_ROUTER: _solidlyRouter,
-            CURVE_ROUTER: _curveRouter
-        });
-        uint256 chainId = getChainID();
-        chainRouters[chainId] = routers;
+        governance = msg.sender;
+
+        uint256 id = totalRouters;
+        routerByIndex[1] = _spookyRouter;
+        indexByRouter[_spookyRouter] = 1;
+        isRouterWorking[1] = true;
+
+        routerByIndex[2] = _solidlyRouter;
+        indexByRouter[_solidlyRouter] = 2;
+        isRouterWorking[2] = true;
+
+        routerByIndex[3] = _curveRouter;
+        indexByRouter[_curveRouter] = 3;
+        isRouterWorking[3] = true;
+
+        // routerByIndex[4] = _iUniswapLPOracleFactory;
+        // indexByRouter[_iUniswapLPOracleFactory] = 4;
+        // isRouterWorking[4] = true;
+
+        totalRouters = 3;
+
         iUniswapLPOracleFactory = IUniswapLPOracleFactory(_iUniswapLPOracleFactory);
     }
 
-    function setRoutersForSpecificChainId(uint256 chainId, address _spookyRouter, address _solidlyRouter, address _curveRouter) external onlyOwner {
-        Routers memory routers = Routers({
-            SPOOKY_ROUTER: _spookyRouter,
-            SOLIDLY_ROUTER: _solidlyRouter,
-            CURVE_ROUTER: _curveRouter
-        });
-        chainRouters[chainId] = routers;
+    function setGovernance(address _newGovernance) public {
+        require(governance == msg.sender, "Only set by current governance");
+        governance = _newGovernance;
     }
 
-    function getChainID() public view returns (uint256) {
-        uint256 id;
-        assembly {
-            id := chainid()
-        }
-        return id;
+    function setRoutersForSpecificChainId(
+        address _router, 
+        bool _isRouterWorking
+    ) external {
+        require(governance == msg.sender, "Only set by current governance");
+        totalRouters = totalRouters + 1;
+        routerByIndex[totalRouters] = _router;
+        indexByRouter[_router] = totalRouters;
+        isRouterWorking[totalRouters] = _isRouterWorking;
     }
 
-    function getUniV2Quote() public view returns(address) {
-        uint256 chainId = getChainID();
-        Routers memory routers = chainRouters[chainId];
-        return routers.SPOOKY_ROUTER;
+    function disableOrEnableRouter(
+        address _router, 
+        bool _isRouterWorking
+    ) external {
+        require(governance == msg.sender, "Only set by current governance");
+        uint256 id = indexByRouter[_router];
+        isRouterWorking[id] = _isRouterWorking;
     }
 
-    function getSolidlyQuote() public view returns(address) {
-        uint256 chainId = getChainID();
-        Routers memory routers = chainRouters[chainId];
-        return routers.SOLIDLY_ROUTER;    
-    }
+    function getBestQuoteFromOracleAggregator(address tokenIn, address tokenOut, uint256 amountIn) external view returns (string memory routerString, uint256 quote) {
+        bytes4 selector = IQuote.getQuote.selector;
+        bytes memory data = abi.encode(amountIn, tokenIn, tokenOut);
 
-    function getCurveQuote() public view returns(address) {
-        uint256 chainId = getChainID();
-        Routers memory routers = chainRouters[chainId];
-        return routers.CURVE_ROUTER;    
-    }
-
-    /// @dev View function for testing the routing of the strategy
-    function findOptimalSwap(address tokenIn, address tokenOut, uint256 amountIn) external view returns (string memory, uint256 amount) {
-        uint256 chainId = getChainID();
-        // Check Solidly
-        (uint256 solidlyQuote, bool stable) = IBaseV1Router01(getSolidlyQuote()).getAmountOut(amountIn, tokenIn, tokenOut);
-
-        // Check Curve
-        (, uint256 curveQuote) = ICurveRouter(getCurveQuote()).get_best_rate(tokenIn, tokenOut, amountIn);
-
-        uint256 spookyQuote; // 0 by default
-
-        // Check Spooky (Can Revert)
-        address[] memory path = new address[](2);
-        path[0] = address(tokenIn);
-        path[1] = address(tokenOut);
-
-        try IUniswapRouterV2(getUniV2Quote()).getAmountsOut(amountIn, path) returns (uint256[] memory spookyAmounts) {
-            spookyQuote = spookyAmounts[spookyAmounts.length - 1]; // Last one is the outToken
-        } catch (bytes memory) {
-            // We ignore as it means it's zero
-        }
-
-        // On average, we expect Solidly and Curve to offer better slippage
-        // Spooky will be the default case
-        if(solidlyQuote > spookyQuote) {
-            // Either SOLID or curve
-            if(curveQuote > solidlyQuote) {
-                // Curve
-                return ("curve", curveQuote);
-            } else {
-                // Solid 
-                return ("SOLID", solidlyQuote);
+        for (uint256 i=1; i<=totalRouters; i++) {
+            address router = routerByIndex[i];
+            uint256 id = indexByRouter[router];
+            if (isRouterWorking[id]) {
+                (bool success, bytes memory returnedData) = address(router).staticcall(abi.encodeWithSignature("getQuote(bytes)", data));
+                (uint256 newQuote, string memory newRouterString) = abi.decode(returnedData, (uint256, string));
+                if (quote < newQuote) {
+                    quote = newQuote;
+                    routerString = newRouterString;
+                }
             }
-
-        } else if (curveQuote > spookyQuote) {
-            // Curve is greater than both
-            return ("curve", curveQuote);
-        } else {
-            // Spooky is best
-            return ("spooky", spookyQuote);
         }
+        return (routerString, quote);
     }
 
-    // calculate price
+    // calculate price of lp token
     function getUnderlyingPrice(address _lpToken, uint256 _lpAmount) public returns(uint256 totalLpPrice) {
         uint256 lpPrice = iUniswapLPOracleFactory.getUnderlyingPrice(_lpToken); // price of one lp token
         require(lpPrice > 0, "Price should be valid!");
@@ -127,7 +109,7 @@ contract PriceOracle is OwnableUpgradeable {
         totalLpPrice = _lpAmount * lpPrice / 1e6;
     }
 
-    // view method only
+    // view method only for lp token price
     function viewUnderlyingPrice(address _lpToken, uint256 _lpAmount) public view returns(uint256 totalLpPrice) {
         uint256 lpPrice = iUniswapLPOracleFactory.viewUnderlyingPrice(_lpToken); // price of one lp token
         require(lpPrice > 0, "Price should be valid!");
@@ -137,4 +119,3 @@ contract PriceOracle is OwnableUpgradeable {
         totalLpPrice = _lpAmount * lpPrice / 1e6;
     }
 }
-

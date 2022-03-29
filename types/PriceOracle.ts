@@ -13,136 +13,106 @@ import {
   Signer,
   utils,
 } from "ethers";
-import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { FunctionFragment, Result } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface PriceOracleInterface extends utils.Interface {
   functions: {
-    "CURVE_ROUTER()": FunctionFragment;
-    "SOLIDLY_ROUTER()": FunctionFragment;
-    "SPOOKY_ROUTER()": FunctionFragment;
-    "chainRouters(uint256)": FunctionFragment;
-    "findOptimalSwap(address,address,uint256)": FunctionFragment;
-    "getChainID()": FunctionFragment;
-    "getCurveQuote()": FunctionFragment;
-    "getSolidlyQuote()": FunctionFragment;
+    "disableOrEnableRouter(address,bool)": FunctionFragment;
+    "getBestQuoteFromOracleAggregator(address,address,uint256)": FunctionFragment;
     "getUnderlyingPrice(address,uint256)": FunctionFragment;
-    "getUniV2Quote()": FunctionFragment;
+    "governance()": FunctionFragment;
     "iUniswapLPOracleFactory()": FunctionFragment;
-    "owner()": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
-    "setRoutersForSpecificChainId(uint256,address,address,address)": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
+    "indexByRouter(address)": FunctionFragment;
+    "isRouterWorking(uint256)": FunctionFragment;
+    "routerByIndex(uint256)": FunctionFragment;
+    "setGovernance(address)": FunctionFragment;
+    "setRoutersForSpecificChainId(address,bool)": FunctionFragment;
+    "totalRouters()": FunctionFragment;
     "viewUnderlyingPrice(address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "CURVE_ROUTER",
-    values?: undefined
+    functionFragment: "disableOrEnableRouter",
+    values: [string, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "SOLIDLY_ROUTER",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "SPOOKY_ROUTER",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "chainRouters",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "findOptimalSwap",
+    functionFragment: "getBestQuoteFromOracleAggregator",
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getChainID",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getCurveQuote",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getSolidlyQuote",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "getUnderlyingPrice",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getUniV2Quote",
+    functionFragment: "governance",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "iUniswapLPOracleFactory",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setRoutersForSpecificChainId",
-    values: [BigNumberish, string, string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
+    functionFragment: "indexByRouter",
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "isRouterWorking",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "routerByIndex",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setGovernance",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setRoutersForSpecificChainId",
+    values: [string, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalRouters",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "viewUnderlyingPrice",
     values: [string, BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "CURVE_ROUTER",
+    functionFragment: "disableOrEnableRouter",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "SOLIDLY_ROUTER",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "SPOOKY_ROUTER",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "chainRouters",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "findOptimalSwap",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "getChainID", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getCurveQuote",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getSolidlyQuote",
+    functionFragment: "getBestQuoteFromOracleAggregator",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "getUnderlyingPrice",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "getUniV2Quote",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "governance", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "iUniswapLPOracleFactory",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
+    functionFragment: "indexByRouter",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "isRouterWorking",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "routerByIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setGovernance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -150,7 +120,7 @@ export interface PriceOracleInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "transferOwnership",
+    functionFragment: "totalRouters",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -158,20 +128,8 @@ export interface PriceOracleInterface extends utils.Interface {
     data: BytesLike
   ): Result;
 
-  events: {
-    "OwnershipTransferred(address,address)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  events: {};
 }
-
-export type OwnershipTransferredEvent = TypedEvent<
-  [string, string],
-  { previousOwner: string; newOwner: string }
->;
-
-export type OwnershipTransferredEventFilter =
-  TypedEventFilter<OwnershipTransferredEvent>;
 
 export interface PriceOracle extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -200,35 +158,20 @@ export interface PriceOracle extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    CURVE_ROUTER(overrides?: CallOverrides): Promise<[string]>;
+    disableOrEnableRouter(
+      _router: string,
+      _isRouterWorking: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    SOLIDLY_ROUTER(overrides?: CallOverrides): Promise<[string]>;
-
-    SPOOKY_ROUTER(overrides?: CallOverrides): Promise<[string]>;
-
-    chainRouters(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [string, string, string] & {
-        SPOOKY_ROUTER: string;
-        SOLIDLY_ROUTER: string;
-        CURVE_ROUTER: string;
-      }
-    >;
-
-    findOptimalSwap(
+    getBestQuoteFromOracleAggregator(
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { amount: BigNumber }>;
-
-    getChainID(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    getCurveQuote(overrides?: CallOverrides): Promise<[string]>;
-
-    getSolidlyQuote(overrides?: CallOverrides): Promise<[string]>;
+    ): Promise<
+      [string, BigNumber] & { routerString: string; quote: BigNumber }
+    >;
 
     getUnderlyingPrice(
       _lpToken: string,
@@ -236,28 +179,37 @@ export interface PriceOracle extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getUniV2Quote(overrides?: CallOverrides): Promise<[string]>;
+    governance(overrides?: CallOverrides): Promise<[string]>;
 
     iUniswapLPOracleFactory(overrides?: CallOverrides): Promise<[string]>;
 
-    owner(overrides?: CallOverrides): Promise<[string]>;
+    indexByRouter(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
-    renounceOwnership(
+    isRouterWorking(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    routerByIndex(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    setGovernance(
+      _newGovernance: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setRoutersForSpecificChainId(
-      chainId: BigNumberish,
-      _spookyRouter: string,
-      _solidlyRouter: string,
-      _curveRouter: string,
+      _router: string,
+      _isRouterWorking: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    totalRouters(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     viewUnderlyingPrice(
       _lpToken: string,
@@ -266,35 +218,18 @@ export interface PriceOracle extends BaseContract {
     ): Promise<[BigNumber] & { totalLpPrice: BigNumber }>;
   };
 
-  CURVE_ROUTER(overrides?: CallOverrides): Promise<string>;
+  disableOrEnableRouter(
+    _router: string,
+    _isRouterWorking: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  SOLIDLY_ROUTER(overrides?: CallOverrides): Promise<string>;
-
-  SPOOKY_ROUTER(overrides?: CallOverrides): Promise<string>;
-
-  chainRouters(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [string, string, string] & {
-      SPOOKY_ROUTER: string;
-      SOLIDLY_ROUTER: string;
-      CURVE_ROUTER: string;
-    }
-  >;
-
-  findOptimalSwap(
+  getBestQuoteFromOracleAggregator(
     tokenIn: string,
     tokenOut: string,
     amountIn: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<[string, BigNumber] & { amount: BigNumber }>;
-
-  getChainID(overrides?: CallOverrides): Promise<BigNumber>;
-
-  getCurveQuote(overrides?: CallOverrides): Promise<string>;
-
-  getSolidlyQuote(overrides?: CallOverrides): Promise<string>;
+  ): Promise<[string, BigNumber] & { routerString: string; quote: BigNumber }>;
 
   getUnderlyingPrice(
     _lpToken: string,
@@ -302,28 +237,31 @@ export interface PriceOracle extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getUniV2Quote(overrides?: CallOverrides): Promise<string>;
+  governance(overrides?: CallOverrides): Promise<string>;
 
   iUniswapLPOracleFactory(overrides?: CallOverrides): Promise<string>;
 
-  owner(overrides?: CallOverrides): Promise<string>;
+  indexByRouter(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  renounceOwnership(
+  isRouterWorking(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  routerByIndex(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  setGovernance(
+    _newGovernance: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setRoutersForSpecificChainId(
-    chainId: BigNumberish,
-    _spookyRouter: string,
-    _solidlyRouter: string,
-    _curveRouter: string,
+    _router: string,
+    _isRouterWorking: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  transferOwnership(
-    newOwner: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  totalRouters(overrides?: CallOverrides): Promise<BigNumber>;
 
   viewUnderlyingPrice(
     _lpToken: string,
@@ -332,35 +270,20 @@ export interface PriceOracle extends BaseContract {
   ): Promise<BigNumber>;
 
   callStatic: {
-    CURVE_ROUTER(overrides?: CallOverrides): Promise<string>;
-
-    SOLIDLY_ROUTER(overrides?: CallOverrides): Promise<string>;
-
-    SPOOKY_ROUTER(overrides?: CallOverrides): Promise<string>;
-
-    chainRouters(
-      arg0: BigNumberish,
+    disableOrEnableRouter(
+      _router: string,
+      _isRouterWorking: boolean,
       overrides?: CallOverrides
-    ): Promise<
-      [string, string, string] & {
-        SPOOKY_ROUTER: string;
-        SOLIDLY_ROUTER: string;
-        CURVE_ROUTER: string;
-      }
-    >;
+    ): Promise<void>;
 
-    findOptimalSwap(
+    getBestQuoteFromOracleAggregator(
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string, BigNumber] & { amount: BigNumber }>;
-
-    getChainID(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getCurveQuote(overrides?: CallOverrides): Promise<string>;
-
-    getSolidlyQuote(overrides?: CallOverrides): Promise<string>;
+    ): Promise<
+      [string, BigNumber] & { routerString: string; quote: BigNumber }
+    >;
 
     getUnderlyingPrice(
       _lpToken: string,
@@ -368,26 +291,34 @@ export interface PriceOracle extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getUniV2Quote(overrides?: CallOverrides): Promise<string>;
+    governance(overrides?: CallOverrides): Promise<string>;
 
     iUniswapLPOracleFactory(overrides?: CallOverrides): Promise<string>;
 
-    owner(overrides?: CallOverrides): Promise<string>;
+    indexByRouter(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
+    isRouterWorking(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    routerByIndex(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    setGovernance(
+      _newGovernance: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     setRoutersForSpecificChainId(
-      chainId: BigNumberish,
-      _spookyRouter: string,
-      _solidlyRouter: string,
-      _curveRouter: string,
+      _router: string,
+      _isRouterWorking: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    transferOwnership(
-      newOwner: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    totalRouters(overrides?: CallOverrides): Promise<BigNumber>;
 
     viewUnderlyingPrice(
       _lpToken: string,
@@ -396,41 +327,21 @@ export interface PriceOracle extends BaseContract {
     ): Promise<BigNumber>;
   };
 
-  filters: {
-    "OwnershipTransferred(address,address)"(
-      previousOwner?: string | null,
-      newOwner?: string | null
-    ): OwnershipTransferredEventFilter;
-    OwnershipTransferred(
-      previousOwner?: string | null,
-      newOwner?: string | null
-    ): OwnershipTransferredEventFilter;
-  };
+  filters: {};
 
   estimateGas: {
-    CURVE_ROUTER(overrides?: CallOverrides): Promise<BigNumber>;
-
-    SOLIDLY_ROUTER(overrides?: CallOverrides): Promise<BigNumber>;
-
-    SPOOKY_ROUTER(overrides?: CallOverrides): Promise<BigNumber>;
-
-    chainRouters(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
+    disableOrEnableRouter(
+      _router: string,
+      _isRouterWorking: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    findOptimalSwap(
+    getBestQuoteFromOracleAggregator(
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    getChainID(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getCurveQuote(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getSolidlyQuote(overrides?: CallOverrides): Promise<BigNumber>;
 
     getUnderlyingPrice(
       _lpToken: string,
@@ -438,28 +349,34 @@ export interface PriceOracle extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getUniV2Quote(overrides?: CallOverrides): Promise<BigNumber>;
+    governance(overrides?: CallOverrides): Promise<BigNumber>;
 
     iUniswapLPOracleFactory(overrides?: CallOverrides): Promise<BigNumber>;
 
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
+    indexByRouter(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    renounceOwnership(
+    isRouterWorking(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    routerByIndex(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    setGovernance(
+      _newGovernance: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setRoutersForSpecificChainId(
-      chainId: BigNumberish,
-      _spookyRouter: string,
-      _solidlyRouter: string,
-      _curveRouter: string,
+      _router: string,
+      _isRouterWorking: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    totalRouters(overrides?: CallOverrides): Promise<BigNumber>;
 
     viewUnderlyingPrice(
       _lpToken: string,
@@ -469,29 +386,18 @@ export interface PriceOracle extends BaseContract {
   };
 
   populateTransaction: {
-    CURVE_ROUTER(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    SOLIDLY_ROUTER(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    SPOOKY_ROUTER(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    chainRouters(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
+    disableOrEnableRouter(
+      _router: string,
+      _isRouterWorking: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    findOptimalSwap(
+    getBestQuoteFromOracleAggregator(
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    getChainID(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getCurveQuote(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getSolidlyQuote(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getUnderlyingPrice(
       _lpToken: string,
@@ -499,30 +405,39 @@ export interface PriceOracle extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getUniV2Quote(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    governance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     iUniswapLPOracleFactory(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    indexByRouter(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
-    renounceOwnership(
+    isRouterWorking(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    routerByIndex(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    setGovernance(
+      _newGovernance: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setRoutersForSpecificChainId(
-      chainId: BigNumberish,
-      _spookyRouter: string,
-      _solidlyRouter: string,
-      _curveRouter: string,
+      _router: string,
+      _isRouterWorking: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    totalRouters(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     viewUnderlyingPrice(
       _lpToken: string,

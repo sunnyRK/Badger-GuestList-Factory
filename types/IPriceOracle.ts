@@ -20,6 +20,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface IPriceOracleInterface extends utils.Interface {
   functions: {
     "findOptimalSwap(address,address,uint256)": FunctionFragment;
+    "getBestQuoteFromOracleAggregator(address,address,uint256)": FunctionFragment;
     "getCurveQuote()": FunctionFragment;
     "getSolidlyQuote()": FunctionFragment;
     "getUnderlyingPrice(address,uint256)": FunctionFragment;
@@ -29,6 +30,10 @@ export interface IPriceOracleInterface extends utils.Interface {
 
   encodeFunctionData(
     functionFragment: "findOptimalSwap",
+    values: [string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getBestQuoteFromOracleAggregator",
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -54,6 +59,10 @@ export interface IPriceOracleInterface extends utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "findOptimalSwap",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getBestQuoteFromOracleAggregator",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -114,6 +123,13 @@ export interface IPriceOracle extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string, BigNumber] & { amount: BigNumber }>;
 
+    getBestQuoteFromOracleAggregator(
+      tokenIn: string,
+      tokenOut: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { amount: BigNumber }>;
+
     getCurveQuote(overrides?: CallOverrides): Promise<[string]>;
 
     getSolidlyQuote(overrides?: CallOverrides): Promise<[string]>;
@@ -140,6 +156,13 @@ export interface IPriceOracle extends BaseContract {
     overrides?: CallOverrides
   ): Promise<[string, BigNumber] & { amount: BigNumber }>;
 
+  getBestQuoteFromOracleAggregator(
+    tokenIn: string,
+    tokenOut: string,
+    amountIn: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber] & { amount: BigNumber }>;
+
   getCurveQuote(overrides?: CallOverrides): Promise<string>;
 
   getSolidlyQuote(overrides?: CallOverrides): Promise<string>;
@@ -160,6 +183,13 @@ export interface IPriceOracle extends BaseContract {
 
   callStatic: {
     findOptimalSwap(
+      tokenIn: string,
+      tokenOut: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber] & { amount: BigNumber }>;
+
+    getBestQuoteFromOracleAggregator(
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,
@@ -195,6 +225,13 @@ export interface IPriceOracle extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getBestQuoteFromOracleAggregator(
+      tokenIn: string,
+      tokenOut: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getCurveQuote(overrides?: CallOverrides): Promise<BigNumber>;
 
     getSolidlyQuote(overrides?: CallOverrides): Promise<BigNumber>;
@@ -216,6 +253,13 @@ export interface IPriceOracle extends BaseContract {
 
   populateTransaction: {
     findOptimalSwap(
+      tokenIn: string,
+      tokenOut: string,
+      amountIn: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getBestQuoteFromOracleAggregator(
       tokenIn: string,
       tokenOut: string,
       amountIn: BigNumberish,

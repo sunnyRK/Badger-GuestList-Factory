@@ -98,7 +98,7 @@ export interface GuestProxyFactory extends BaseContract {
       _userDepositCap: BigNumberish,
       _totalDepositCap: BigNumberish,
       _guestRoot: BytesLike,
-      isLPToken: boolean,
+      _isLPToken: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -116,7 +116,7 @@ export interface GuestProxyFactory extends BaseContract {
     _userDepositCap: BigNumberish,
     _totalDepositCap: BigNumberish,
     _guestRoot: BytesLike,
-    isLPToken: boolean,
+    _isLPToken: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -134,7 +134,7 @@ export interface GuestProxyFactory extends BaseContract {
       _userDepositCap: BigNumberish,
       _totalDepositCap: BigNumberish,
       _guestRoot: BytesLike,
-      isLPToken: boolean,
+      _isLPToken: boolean,
       overrides?: CallOverrides
     ): Promise<[string, string] & { instanceCreated: string; result: string }>;
 
@@ -155,7 +155,7 @@ export interface GuestProxyFactory extends BaseContract {
       _userDepositCap: BigNumberish,
       _totalDepositCap: BigNumberish,
       _guestRoot: BytesLike,
-      isLPToken: boolean,
+      _isLPToken: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -174,7 +174,7 @@ export interface GuestProxyFactory extends BaseContract {
       _userDepositCap: BigNumberish,
       _totalDepositCap: BigNumberish,
       _guestRoot: BytesLike,
-      isLPToken: boolean,
+      _isLPToken: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
