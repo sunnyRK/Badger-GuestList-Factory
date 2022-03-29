@@ -7,11 +7,21 @@ import "hardhat/console.sol";
 // SpookyRouter For Fantom
 contract UniswapV2Router {
 
+    /// @notice chainId -> uniswapV2 router address
     mapping(uint256 => address) public uniswapV2Routers;
+
+    /// @notice uniswapV2 router address -> bool(is router is working)
     mapping(address => bool) public isRouterWorking;
+
+    /// @notice owner of UniswapV2Router
     address public governance;
+
+    /// @notice uniswapV2 name
     string public uniswapString = 'uniswapV2';
 
+    /**
+     * @notice constructor of UniswapV2Router contract
+     */
     constructor(address _uniswapRouter) public {
         governance = msg.sender;
         uint256 chainId = getChainID();
@@ -19,12 +29,22 @@ contract UniswapV2Router {
         isRouterWorking[_uniswapRouter] = true;
     }
 
+    /**
+     * @notice set new Governance by current governance
+     * @param _newGovernance newGovernance address
+     */    
     function setGovernance(address _newGovernance) public {
         require(governance == msg.sender, "Only set by current governance");
         governance = _newGovernance;
     }
 
-    function setRoutersForSpecificChainId(
+    /**
+     * @notice addRouterForChainId by current governance
+     * @param _chainId chain id of network
+     * @param _uniswapRouter curve router address
+     * @param _isRouterWorking is router in working mode or not
+     */
+    function addRouterForChainId(
         uint256 _chainId, 
         address _uniswapRouter,
         bool _isRouterWorking
@@ -34,6 +54,9 @@ contract UniswapV2Router {
         isRouterWorking[_uniswapRouter] = _isRouterWorking;
     }
 
+    /**
+     * @notice getChainID fetch chain id of current network
+     */
     function getChainID() public view returns (uint256) {
         uint256 id;
         assembly {
@@ -42,12 +65,17 @@ contract UniswapV2Router {
         return id;
     }
 
+    /**
+     * @notice getRouter get router address by chain id
+     */
     function getRouter() public view returns(address) {
         uint256 chainId = getChainID();
         return uniswapV2Routers[chainId];
     }
 
-    /// @dev View function for testing the routing of the strategy
+    /**
+     * @notice getQuote get price of tokenIn in tokenOut for current chainid
+     */
     function getQuote(
         bytes memory data
     ) external view returns (uint256 spookyQuote, string memory _uniswap) {

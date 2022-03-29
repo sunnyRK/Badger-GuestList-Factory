@@ -19,6 +19,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface PriceOracleInterface extends utils.Interface {
   functions: {
+    "addNewOrEditRouter(address,bool)": FunctionFragment;
     "disableOrEnableRouter(address,bool)": FunctionFragment;
     "getBestQuoteFromOracleAggregator(address,address,uint256)": FunctionFragment;
     "getUnderlyingPrice(address,uint256)": FunctionFragment;
@@ -28,11 +29,14 @@ export interface PriceOracleInterface extends utils.Interface {
     "isRouterWorking(uint256)": FunctionFragment;
     "routerByIndex(uint256)": FunctionFragment;
     "setGovernance(address)": FunctionFragment;
-    "setRoutersForSpecificChainId(address,bool)": FunctionFragment;
     "totalRouters()": FunctionFragment;
     "viewUnderlyingPrice(address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "addNewOrEditRouter",
+    values: [string, boolean]
+  ): string;
   encodeFunctionData(
     functionFragment: "disableOrEnableRouter",
     values: [string, boolean]
@@ -70,10 +74,6 @@ export interface PriceOracleInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "setRoutersForSpecificChainId",
-    values: [string, boolean]
-  ): string;
-  encodeFunctionData(
     functionFragment: "totalRouters",
     values?: undefined
   ): string;
@@ -82,6 +82,10 @@ export interface PriceOracleInterface extends utils.Interface {
     values: [string, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "addNewOrEditRouter",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "disableOrEnableRouter",
     data: BytesLike
@@ -113,10 +117,6 @@ export interface PriceOracleInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setGovernance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setRoutersForSpecificChainId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -158,6 +158,12 @@ export interface PriceOracle extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    addNewOrEditRouter(
+      _router: string,
+      _isRouterWorking: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     disableOrEnableRouter(
       _router: string,
       _isRouterWorking: boolean,
@@ -203,12 +209,6 @@ export interface PriceOracle extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setRoutersForSpecificChainId(
-      _router: string,
-      _isRouterWorking: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     totalRouters(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     viewUnderlyingPrice(
@@ -217,6 +217,12 @@ export interface PriceOracle extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { totalLpPrice: BigNumber }>;
   };
+
+  addNewOrEditRouter(
+    _router: string,
+    _isRouterWorking: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   disableOrEnableRouter(
     _router: string,
@@ -255,12 +261,6 @@ export interface PriceOracle extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setRoutersForSpecificChainId(
-    _router: string,
-    _isRouterWorking: boolean,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   totalRouters(overrides?: CallOverrides): Promise<BigNumber>;
 
   viewUnderlyingPrice(
@@ -270,6 +270,12 @@ export interface PriceOracle extends BaseContract {
   ): Promise<BigNumber>;
 
   callStatic: {
+    addNewOrEditRouter(
+      _router: string,
+      _isRouterWorking: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     disableOrEnableRouter(
       _router: string,
       _isRouterWorking: boolean,
@@ -312,12 +318,6 @@ export interface PriceOracle extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setRoutersForSpecificChainId(
-      _router: string,
-      _isRouterWorking: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     totalRouters(overrides?: CallOverrides): Promise<BigNumber>;
 
     viewUnderlyingPrice(
@@ -330,6 +330,12 @@ export interface PriceOracle extends BaseContract {
   filters: {};
 
   estimateGas: {
+    addNewOrEditRouter(
+      _router: string,
+      _isRouterWorking: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     disableOrEnableRouter(
       _router: string,
       _isRouterWorking: boolean,
@@ -370,12 +376,6 @@ export interface PriceOracle extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setRoutersForSpecificChainId(
-      _router: string,
-      _isRouterWorking: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     totalRouters(overrides?: CallOverrides): Promise<BigNumber>;
 
     viewUnderlyingPrice(
@@ -386,6 +386,12 @@ export interface PriceOracle extends BaseContract {
   };
 
   populateTransaction: {
+    addNewOrEditRouter(
+      _router: string,
+      _isRouterWorking: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     disableOrEnableRouter(
       _router: string,
       _isRouterWorking: boolean,
@@ -428,12 +434,6 @@ export interface PriceOracle extends BaseContract {
 
     setGovernance(
       _newGovernance: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setRoutersForSpecificChainId(
-      _router: string,
-      _isRouterWorking: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

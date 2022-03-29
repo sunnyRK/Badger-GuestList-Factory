@@ -31,7 +31,7 @@ import {
 import { Signer } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
 
-describe('GenericProxyFactory', () => {
+describe('Guest List tests', () => {
   let contractsOwner: Signer;
   let _contractsOwner: any;
 	let _yieldSourceOwner: any;
@@ -310,6 +310,7 @@ describe('GenericProxyFactory', () => {
       expect(userDepositCap).to.eq(userCap)
     })
 
+    // Price of lp token is grater than Zero
     it ('should get price of lp', async() => {
       const totalDepositCap = await guest.totalDepositCap();
       expect(totalDepositCap).to.gt(0)

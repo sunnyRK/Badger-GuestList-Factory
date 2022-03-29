@@ -18,13 +18,27 @@ interface IQuote {
 
 contract PriceOracle {
 
+    /// @notice lp token interface
     IUniswapLPOracleFactory public iUniswapLPOracleFactory;
+
+    /// @notice id -> router address
     mapping(uint256 => address) public routerByIndex;
+
+    /// @notice router -> id address
     mapping(address => uint256) public indexByRouter;
+
+    /// @notice id -> bool(is router is working)
     mapping(uint256 => bool) public isRouterWorking;
+
+    /// @notice total number of router
     uint256 public totalRouters;
+
+    /// @notice owner of priceOracle
     address public governance;
 
+    /**
+     * @notice constructor of Price Oracle contract
+     */
     constructor(
         address _spookyRouter, 
         address _solidlyRouter, 
@@ -46,22 +60,27 @@ contract PriceOracle {
         indexByRouter[_curveRouter] = 3;
         isRouterWorking[3] = true;
 
-        // routerByIndex[4] = _iUniswapLPOracleFactory;
-        // indexByRouter[_iUniswapLPOracleFactory] = 4;
-        // isRouterWorking[4] = true;
-
         totalRouters = 3;
 
         iUniswapLPOracleFactory = IUniswapLPOracleFactory(_iUniswapLPOracleFactory);
     }
 
+    /**
+     * @notice set new Governance by current governance
+     * @param _newGovernance newGovernance address
+     */
     function setGovernance(address _newGovernance) public {
         require(governance == msg.sender, "Only set by current governance");
         governance = _newGovernance;
     }
 
-    function setRoutersForSpecificChainId(
-        address _router, 
+    /**
+     * @notice addNewOrEditRouter by current governance
+     * @param _router new router address
+     * @param _isRouterWorking is router in working mode or not
+     */
+    function addNewOrEditRouter(
+        address _router,
         bool _isRouterWorking
     ) external {
         require(governance == msg.sender, "Only set by current governance");
@@ -71,6 +90,9 @@ contract PriceOracle {
         isRouterWorking[totalRouters] = _isRouterWorking;
     }
 
+    /**
+     * @notice disableOrEnableRouter by current governance
+     */
     function disableOrEnableRouter(
         address _router, 
         bool _isRouterWorking
@@ -80,6 +102,14 @@ contract PriceOracle {
         isRouterWorking[id] = _isRouterWorking;
     }
 
+    /**
+     * @notice getBestQuoteFromOracleAggregator get best price from onChain oracles
+     * @param tokenIn input token
+     * @param tokenOut output token
+     * @param amountIn input amount
+     * @return routerString router name
+     * @return quote best price
+     */
     function getBestQuoteFromOracleAggregator(address tokenIn, address tokenOut, uint256 amountIn) external view returns (string memory routerString, uint256 quote) {
         bytes4 selector = IQuote.getQuote.selector;
         bytes memory data = abi.encode(amountIn, tokenIn, tokenOut);
@@ -99,7 +129,9 @@ contract PriceOracle {
         return (routerString, quote);
     }
 
-    // calculate price of lp token
+    /**
+     * @notice getUnderlyingPrice calculate price of lp token (not view function)
+    **/
     function getUnderlyingPrice(address _lpToken, uint256 _lpAmount) public returns(uint256 totalLpPrice) {
         uint256 lpPrice = iUniswapLPOracleFactory.getUnderlyingPrice(_lpToken); // price of one lp token
         require(lpPrice > 0, "Price should be valid!");
@@ -109,7 +141,9 @@ contract PriceOracle {
         totalLpPrice = _lpAmount * lpPrice / 1e6;
     }
 
-    // view method only for lp token price
+    /**
+     * @notice viewUnderlyingPrice view method only for lp token price(view function)
+    **/
     function viewUnderlyingPrice(address _lpToken, uint256 _lpAmount) public view returns(uint256 totalLpPrice) {
         uint256 lpPrice = iUniswapLPOracleFactory.viewUnderlyingPrice(_lpToken); // price of one lp token
         require(lpPrice > 0, "Price should be valid!");

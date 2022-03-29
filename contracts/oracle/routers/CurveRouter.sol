@@ -6,11 +6,21 @@ import "hardhat/console.sol";
 
 contract CurveRouter {
 
+    /// @notice chainId -> curve router address
     mapping(uint256 => address) public curveRouters;
+
+    /// @notice curve router address -> bool(is router is working)
     mapping(address => bool) public isRouterWorking;
+
+    /// @notice owner of CurveRouter
     address public governance;
+
+    /// @notice curve name
     string public curveString = 'curve';
 
+    /**
+     * @notice constructor of CurveRouter contract
+     */
     constructor(address _curveRouter) public {
         governance = msg.sender;
         uint256 chainId = getChainID();
@@ -18,12 +28,22 @@ contract CurveRouter {
         isRouterWorking[_curveRouter] = true;
     }
 
+    /**
+     * @notice set new Governance by current governance
+     * @param _newGovernance newGovernance address
+     */    
     function setGovernance(address _newGovernance) public {
         require(governance == msg.sender, "Only set by current governance");
         governance = _newGovernance;
     }
 
-    function setRoutersForSpecificChainId(
+    /**
+     * @notice addRouterForChainId by current governance
+     * @param _chainId chain id of network
+     * @param _curveRouter curve router address
+     * @param _isRouterWorking is router in working mode or not
+     */
+    function addRouterForChainId(
         uint256 _chainId, 
         address _curveRouter,
         bool _isRouterWorking
@@ -33,6 +53,9 @@ contract CurveRouter {
         isRouterWorking[_curveRouter] = _isRouterWorking;
     }
 
+    /**
+     * @notice getChainID fetch chain id of current network
+     */
     function getChainID() public view returns (uint256) {
         uint256 id;
         assembly {
@@ -41,12 +64,17 @@ contract CurveRouter {
         return id;
     }
 
+    /**
+     * @notice getRouter get router address by chain id
+     */
     function getRouter() public view returns(address) {
         uint256 chainId = getChainID();
         return curveRouters[chainId];
     }
 
-    /// @dev View function for testing the routing of the strategy
+    /**
+     * @notice getQuote get price of tokenIn in tokenOut for current chainid
+     */
     function getQuote(
         bytes memory data
     ) external view returns (uint256 curveQuote, string memory _curve) {

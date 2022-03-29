@@ -25,3 +25,18 @@ There is `PriceOracle` to fetch the price from different on chain apis. like sol
 
 6). Run testcases in terminal-2
 -   npx hardhat test --network local
+
+### Main Contracts 
+
+1). GenericProxyFactory with import of OZ ClonesUpgradable:   https://github.com/sunnyRK/Badger-GuestList-Factory/blob/main/contracts/proxy/GenericProxyFactory.sol
+
+2). GuestProxyFactory:   
+https://github.com/sunnyRK/Badger-GuestList-Factory/blob/main/contracts/GuestProxyFactory.sol
+
+3). PriceOracle:  
+https://github.com/sunnyRK/Badger-GuestList-Factory/blob/main/contracts/oracle/PriceOracle.sol
+
+4). Multiple Oracle routers and lp token Oracles:  
+https://github.com/sunnyRK/Badger-GuestList-Factory/tree/main/contracts/oracle/routers
+
+
